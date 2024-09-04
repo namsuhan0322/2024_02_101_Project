@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class MoveTest : MonoBehaviour
 {
+    public Vector3 Player;
+
     void Start()
     {
         
