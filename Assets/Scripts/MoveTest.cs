@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class MoveTest : MonoBehaviour
 {
+    public Transform Player;
     void Start()
     {
         
