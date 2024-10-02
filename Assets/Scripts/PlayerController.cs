@@ -6,8 +6,9 @@ public class PlayerController : MonoBehaviour
 {
     // 플레이어의 움직임속도를 설정하는 변수
     [Header("Player Movement")]
-    public float moveSpeed = 5.0f;  // 이동속도
-    public float jumpForce = 5.0f;  // 점프 힘
+    public float moveSpeed = 5.0f;      // 이동속도
+    public float jumpForce = 5.0f;      // 점프 힘
+    public float rotationSpeed = 10f;   // 회전 속도
 
     // 카메라 설정 변수
     [Header("Camera Settings")]
@@ -29,7 +30,7 @@ public class PlayerController : MonoBehaviour
     public float mouseSenesitivity = 2f;            // 마우스 감도
 
     // 내부 변수들
-    private bool isFirstPerson = true;  // 1인칭 모드 인지 여부
+    public bool isFirstPerson = true;  // 1인칭 모드 인지 여부
     private bool isGrounded;            // 플레이어가 땅에 있는지 여부
     private Rigidbody rb;               // 플레이어의 Rigidbody
 
@@ -43,11 +44,15 @@ public class PlayerController : MonoBehaviour
     }
 
     void Update()
-    {       
-        HandleMovement();
+    {        
         HandleRotation();
         HandleJump();
         HandleCameraToggle();
+    }
+
+    private void FixedUpdate()
+    {
+        HandleMovement();
     }
 
     // 활성화할 카메라를 설정하는 함수
@@ -72,11 +77,9 @@ public class PlayerController : MonoBehaviour
         targetVerticalRoatation = Mathf.Clamp(targetVerticalRoatation, yMinLimit, yMaxLimit);   // 수직 회전 제한
         phi = Mathf.MoveTowards(phi, targetVerticalRoatation, verticalRotationSpeed * Time.deltaTime);
 
-        // 플레이어 회전(캐릭터가 수평으로만 회전)
-        transform.rotation = Quaternion.Euler(0.0f, theta, 0.0f);
-
         if (isFirstPerson)
         {
+            transform.rotation = Quaternion.Euler(0.0f, theta, 0.0f);
             firstPersonCamera.transform.localRotation = Quaternion.Euler(phi, 0.0f, 0.0f);  // 1인칭 카메라 수직 회전
         }
         else
@@ -128,6 +131,8 @@ public class PlayerController : MonoBehaviour
         float moverHorizontal = Input.GetAxis("Horizontal");        // 좌우 입력 (-1, 1)
         float moverVertical = Input.GetAxis("Vertical");            // 앞뒤 입력 (1, -1)
 
+        Vector3 movement;
+
         if (!isFirstPerson)     // 3인칭 모드 일 때, 카메라 방향으로 이동 처리
         {
             Vector3 cameraForward = thridPersonCamera.transform.forward;    // 카메라 앞 방향
@@ -139,15 +144,22 @@ public class PlayerController : MonoBehaviour
             cameraRight.Normalize();
 
             // 이동 벡터 계산
-            Vector3 movement = cameraForward * moverVertical + cameraRight * moverHorizontal;
-            rb.MovePosition(rb.position + movement * moveSpeed * Time.deltaTime);       // 물리 기반 이동
+            movement = cameraForward * moverVertical + cameraRight * moverHorizontal;
         }
         else
         {
             // 캐릭터 기준으로 이동
-            Vector3 movement = transform.right * moverHorizontal + transform.forward * moverVertical;
-            rb.MovePosition(rb.position + movement * moveSpeed * Time.deltaTime);       // 물리 기반 이동
+            movement = transform.right * moverHorizontal + transform.forward * moverVertical;
         }  
+
+        // 이동 방향으로 캐릭터 회전
+        if (movement.magnitude > 0.1f)
+        {
+            Quaternion toRotation = Quaternion.LookRotation(movement, Vector3.up);
+            transform.rotation = Quaternion.Slerp(transform.rotation, toRotation, rotationSpeed * Time.deltaTime);
+        }
+
+        rb.MovePosition(rb.position + movement * moveSpeed * Time.deltaTime);
     }
 
     // 플레이어가 땅에 닿아 있는지 감지
