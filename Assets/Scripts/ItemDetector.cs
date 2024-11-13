@@ -21,7 +21,7 @@ public class ItemDetector : MonoBehaviour
     void Start()
     {
         lastPosition = transform.position;          // 시작 시 현재 위치를 마지막 위치로 설정
-        CheckForLtems();                            // 초기 아이템 체크 수행
+        CheckForItems();                            // 초기 아이템 체크 수행
     }
 
     void Update()
@@ -29,7 +29,7 @@ public class ItemDetector : MonoBehaviour
         // 플레이어가 일정 거리 이상 이동했는지 체크
         if (Vector3.Distance(lastPosition, transform.position) > moveTreshold)
         {
-            CheckForLtems();                        // 이동시 아이템 체크
+            CheckForItems();                        // 이동시 아이템 체크
             lastPosition = transform.position;      // 현재 위치를 마지막 위치로 업데이트
         }
 
@@ -41,7 +41,7 @@ public class ItemDetector : MonoBehaviour
     }
 
     // 주변의 수집 가능한 아아탬울 감지하는 함수
-    private void CheckForLtems()
+    private void CheckForItems()
     {
         Collider[] hitColliders = Physics.OverlapSphere(transform.position, checkRadius);       // 감지 법위 내의 모든 콜라이더를 찾음
 
