@@ -8,7 +8,10 @@ public enum ItemType
     Crystal,            // 크리스탈
     Plant,              // 식물
     Bush,               // 수풀
-    Tree                // 나무
+    Tree,               // 나무
+    VegetableStew,      // 야채 스튜 (허기 회복용)
+    FruitSalad,         // 과일 샐러드 (허기 회복용)
+    RepairKit           // 수리 키드 (우주복 수리용)
 }
 
 public class ItemDetector : MonoBehaviour
